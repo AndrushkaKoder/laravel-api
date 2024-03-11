@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\ArticlesService\ArticlesService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
 
 class FilesController extends Controller
 {
@@ -15,17 +16,23 @@ class FilesController extends Controller
 		$this->service = new ArticlesService();
 	}
 
-	public function getOuterFile(Request $request): mixed
+	public function getOuterFile(Request $request)
 	{
-		if ($request->isMethod('post')) {
-			$file = $request->file('file');
-			return $this->service->getResponseFile($file instanceof UploadedFile ? $file : null);
+		try {
+			if ($request->isMethod('post')) {
+				$file = $request->file('file');
+				return $this->sendFile($file);
+			} else {
+				throw new \Exception('Method not allowed!');
+			}
+
+		} catch (\Exception $exception) {
+			return Http::response($exception->getMessage(), 405);
 		}
-		return null;
 	}
 
-	protected function sendFile()
+	protected function sendFile($file)
 	{
-
+		return $this->service->getResponseFile($file instanceof UploadedFile ? $file : null);
 	}
 }

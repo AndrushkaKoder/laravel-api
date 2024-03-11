@@ -6,17 +6,19 @@ use Illuminate\Http\UploadedFile;
 
 class ArticlesService
 {
-	public function getResponseFile(UploadedFile|null $file): mixed
+	/*
+	 * Сервис обработки статей (файлов)
+	 */
+	public function getResponseFile(UploadedFile|null $file)
 	{
+		$handler = new FileHandler();
 		if ($file) {
-			 $handler = new FileHandler();
+			return $handler->updateUploadedFile($file);
 			//Если пришел файл, обработать его и вернуть
 		} else {
-			$handler = new FileHandler();
-			//dd(ImportArticles::getArticlesFile());
+			return $handler->getFileFromOuterApi();
 			//Если файла нет, получить по апи данные, записать в файл и вернуть
 		}
-		return null;
 	}
 
 }

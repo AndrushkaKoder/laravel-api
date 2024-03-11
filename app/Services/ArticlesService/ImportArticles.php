@@ -20,11 +20,4 @@ class ImportArticles
 			];
 		}, array_slice($outerArticles->json(), 0, self::$maxArticlesCount) ?? []);
 	}
-
-	public static function getArticlesFile()
-	{
-		//Генерить и возвращать xls файл
-		$data = self::getOuterArticlesInArray();
-	}
-
 }
