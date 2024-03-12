@@ -10,50 +10,44 @@ class FileHandler
 {
 	private string $extension = 'xlsx';
 
-	protected function createXlsFile(array $data): string
+	protected function createXlsFile($data, bool $wasReady = false): string
 	{
+		if ($wasReady) unset($data[0]);
+
 		$filename = md5(rand(1, 1000) . '_file') . ".{$this->extension}";
-		$pathToSave = public_path() . '/' . $filename;
+		$pathToSave = storage_path('app/public/' . $filename);
 		$spreadSheet = new Spreadsheet();
 		$sheet = $spreadSheet->getActiveSheet();
 
-		$sheet->setCellValue('A1', 'title');
-		$sheet->setCellValue('B1', 'text');
-		$sheet->setCellValue('C1', 'created_at');
-
 		if ($data) {
 			foreach ($data as $i => $item) {
-				$fieldIndex = $i + 2;
-				$sheet->setCellValue("A{$fieldIndex}", $item['title']);
-				$sheet->setCellValue("B{$fieldIndex}", $item['text']);
-				$sheet->setCellValue("C{$fieldIndex}", $item['created_at']);
+				$sheet->setCellValue([$i + 1, 1], $item[0] ?? '');
+				$sheet->setCellValue([$i + 1, 2], $item[1] ?? '');
 			}
 		}
-
 		$writer = new Xlsx($spreadSheet);
 		$writer->save($pathToSave);
-
-		return url($pathToSave);
+		return url("storage/{$filename}");
 	}
 
 	public function updateUploadedFile($file): string
 	{
-//		dd($this->loadFile($file));
-		return '';
+		$dataArray = $this->loadFile($file);
+		return $this->createXlsFile($dataArray, true);
 	}
 
 	public function getFileFromOuterApi(): string
 	{
-		$outerArticles = ImportArticles::getOuterArticlesInArray();
-		return $this->createXlsFile($outerArticles);
+		$dataArray = ImportArticles::getOuterArticlesInArray();
+		return $this->createXlsFile($dataArray);
 	}
 
-	private function loadFile($file)
+	private function loadFile($file): array
 	{
 		$inputType = IOFactory::identify($file);
 		$loader = IOFactory::createReader($inputType);
-		return $loader->load($inputType);
-
+		$file = $loader->load($file);
+		return $file->getActiveSheet()->toArray();
 	}
 
 }

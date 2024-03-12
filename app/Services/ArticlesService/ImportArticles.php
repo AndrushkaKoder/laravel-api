@@ -14,9 +14,9 @@ class ImportArticles
 		$outerArticles = Http::get(self::$url);
 		return array_map(function ($article) {
 			return [
-				'title' => trim(data_get($article, 'title.rendered')),
-				'text' => trim(data_get($article, 'excerpt.rendered')),
-				'created_at' => data_get($article, 'date'),
+				trim(data_get($article, 'title.rendered')),
+				trim(data_get($article, 'excerpt.rendered')),
+				data_get($article, 'date'),
 			];
 		}, array_slice($outerArticles->json(), 0, self::$maxArticlesCount) ?? []);
 	}

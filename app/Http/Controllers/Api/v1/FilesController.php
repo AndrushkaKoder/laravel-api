@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Http;
 
 class FilesController extends Controller
 {
+	private array $extensions = [
+		'xlsx',
+		'xls'
+	];
 
 	public function __construct(protected ArticlesService $service)
 	{
@@ -21,17 +25,21 @@ class FilesController extends Controller
 		try {
 			if ($request->isMethod('post')) {
 				$file = $request->file('file');
+				if ($file) {
+					if (!in_array($file->extension(), $this->extensions))
+						throw new \Exception('Incorrect file format!');
+				}
 				return $this->sendFile($file);
 			} else {
 				throw new \Exception('Method not allowed!');
 			}
 
 		} catch (\Exception $exception) {
-			return Http::response($exception->getMessage(), 405);
+			die($exception->getMessage());
 		}
 	}
 
-	protected function sendFile($file)
+	protected function sendFile($file): string
 	{
 		return $this->service->getResponseFile($file instanceof UploadedFile ? $file : null);
 	}
