@@ -10,10 +10,8 @@ class FileHandler
 {
 	private string $extension = 'xlsx';
 
-	protected function createXlsFile($data, bool $wasReady = false): string
+	protected function createXlsFile($data): string
 	{
-		if ($wasReady) unset($data[0]);
-
 		$filename = md5(rand(1, 1000) . '_file') . ".{$this->extension}";
 		$pathToSave = storage_path('app/public/' . $filename);
 		$spreadSheet = new Spreadsheet();
@@ -33,7 +31,7 @@ class FileHandler
 	public function updateUploadedFile($file): string
 	{
 		$dataArray = $this->loadFile($file);
-		return $this->createXlsFile($dataArray, true);
+		return $this->createXlsFile($dataArray);
 	}
 
 	public function getFileFromOuterApi(): string

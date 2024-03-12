@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Services\ArticlesService\ArticlesService;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Http;
 
 class FilesController extends Controller
 {
